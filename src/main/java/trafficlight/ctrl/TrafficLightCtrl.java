@@ -13,6 +13,8 @@ public class TrafficLightCtrl {
 
     private State yellowState;
 
+    private  State offState;
+
     private State currentState;
 
     private State previousState;
@@ -40,6 +42,7 @@ public class TrafficLightCtrl {
         redState = new RedState(this);
         greenState = new GreenState(this);
         yellowState = new YellowState(this);
+        offState = new OffState(this);
         setCurrentState(greenState);
         setPreviousState(yellowState);
     }
@@ -58,6 +61,10 @@ public class TrafficLightCtrl {
 
     public State getCurrentState() {
         return currentState;
+    }
+
+    public State getOffState() {
+        return offState;
     }
 
     public void setCurrentState(State currentState) {

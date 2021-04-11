@@ -14,10 +14,13 @@ public class TrafficLightGui extends JFrame implements ActionListener {
 
     public static final String ACTION_COMMAND_AUTO_MODE = "autoMode";
     public static final String NAME_OF_THE_GAME = "Traffic Light";
+    public static final String ACTION_COMMAND_FLASHYELLOW = "flashYellow";
 
     private JButton buttonNextState;
+    private JCheckBox CheckBoxFlashYellow;
     private JCheckBox checkBoxAutoMode;
     private JLabel labelAutoMode;
+    private JLabel labelFlashYellow;
 
     private Light green = null;
     private Light yellow = null;
@@ -27,6 +30,7 @@ public class TrafficLightGui extends JFrame implements ActionListener {
 
     private boolean isAutoMode = false;
     private boolean doExit = false;
+    private boolean flashYellow = false;
 
     private int yellowIntervall = 500;
 
@@ -51,11 +55,16 @@ public class TrafficLightGui extends JFrame implements ActionListener {
         buttonNextState.setActionCommand(ACTION_COMMAND_NEXT);
         buttonNextState.addActionListener(this);
 
-        labelAutoMode = new JLabel("AutoMode ");
+        labelFlashYellow = new JLabel("FlashYellow ");
+        CheckBoxFlashYellow = new JCheckBox();
+        CheckBoxFlashYellow.setActionCommand("flashYellow");
+        CheckBoxFlashYellow.addActionListener(this);
 
+        labelAutoMode = new JLabel("AutoMode ");
         checkBoxAutoMode = new JCheckBox();
         checkBoxAutoMode.setActionCommand("autoMode");
         checkBoxAutoMode.addActionListener(this);
+
 
         JPanel p1 = new JPanel(new GridLayout(3,1));
         p1.add(red);
@@ -67,6 +76,8 @@ public class TrafficLightGui extends JFrame implements ActionListener {
         p2.add(buttonNextState);
         p2.add(labelAutoMode);
         p2.add(checkBoxAutoMode);
+        p2.add(labelFlashYellow);
+        p2.add(CheckBoxFlashYellow);
 
         getContentPane().add(p1);
         getContentPane().add(p2);
@@ -102,15 +113,42 @@ public class TrafficLightGui extends JFrame implements ActionListener {
                     isAutoMode = false;
                 }
             }
+             while (flashYellow) {
+                 TrafficLightCtrl ctrl = TrafficLightCtrl.getInstance();
+
+                 ctrl.setPreviousState(ctrl.getYellowState());
+                 ctrl.setCurrentState(ctrl.getOffState());
+                 ctrl.nextState();
+
+                 try {
+                     if (yellow.isOn) {
+                         Thread.sleep(yellowIntervall);
+
+                     } else {
+                         Thread.sleep(intervall);
+                     }
+                 } catch (InterruptedException e) {
+                     JOptionPane pane = new JOptionPane();
+                     JDialog dialog = pane.createDialog(this,"Traffic Light Problem");
+                     JOptionPane.showMessageDialog(dialog, e.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+                     flashYellow = false;
+                 }
+
+             }
         }
     }
 
     public void actionPerformed(ActionEvent e){
+        //if(ACTION_COMMAND_FLASHYELLOW.equals())
+
         if (ACTION_COMMAND_NEXT.equals(e.getActionCommand())){
            trafficLightCtrl.nextState();
         } else if (ACTION_COMMAND_AUTO_MODE.equals(e.getActionCommand())){
             isAutoMode = !isAutoMode;
             System.out.println("set Auto mode to "+isAutoMode);
+        } else if(ACTION_COMMAND_FLASHYELLOW.equals(e.getActionCommand())){
+            flashYellow = !flashYellow;
+            System.out.println("set Flash Mode to "+flashYellow);
         }
     }
 
@@ -130,6 +168,13 @@ public class TrafficLightGui extends JFrame implements ActionListener {
             red.turnOn(false);
             green.turnOn(true);
             yellow.turnOn(false);
+        }
+        if(trafficLightColor == TrafficLightColor.OFF){
+            red.turnOn(false);
+            green.turnOn(false);
+            if(yellow.isOn){
+                yellow.turnOn(false);
+            } else yellow.turnOn(true);
         }
     }
 }

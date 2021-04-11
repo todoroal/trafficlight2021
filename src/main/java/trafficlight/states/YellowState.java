@@ -14,12 +14,12 @@ public class YellowState implements State{
     public void nextState() {
         if(ctrl.getPreviousState().equals(ctrl.getRedState())){
             ctrl.setCurrentState(ctrl.getGreenState());
-            ctrl.setPreviousState(this);
         }
+
         else{
             ctrl.setCurrentState(ctrl.getRedState());
-            ctrl.setPreviousState(this);
         }
+        ctrl.setPreviousState(this);
     }
 
     @Override
